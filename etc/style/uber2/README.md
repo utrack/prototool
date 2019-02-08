@@ -9,6 +9,7 @@ This is the second version of the Uber Protobuf Style Guide.
   * [Syntax](#syntax)
   * [File Options](#file-options)
   * [Imports](#imports)
+  * [Enums](#enums)
 
 See the [uber](uber) directory for an example of all concepts explained in this Style Guide.
 
@@ -405,6 +406,49 @@ file](https://github.com/protocolbuffers/protobuf/releases).
 
 ## Enums
 
-Enums should always be `PascalCase`.
+Enums should always be `PascalCase`. Enum values should be `UPPER_SNAKE_CASE`.
 
-Enum
+The enum option `allow_aliases` should never be used.
+
+Enum values have strict naming requirements.
+
+- All enum values must have the name of the enum prefixed to all values as `UPPER_SNAKE_CASE`.
+  For example, for an enum `TripType`, all values must be prefixed with `TRIP_TYPE_`.
+
+This is due to Protobuf enums using C++ scoping rules. This results in it not being
+possible to have two enums with the same value. For example, the following is not valid
+Protobuf, regardless of file structure.
+
+```proto
+syntax = "proto3";
+
+package uber.trip.v1;
+
+enum Foo {
+  CAR = 0;
+}
+
+enum Bar {
+  CAR = 0;
+}
+```
+
+Compiling this file will result in the following errors from `protoc`.
+
+```
+uber/trip/v1/trip.proto:10:3:"CAR" is already defined in "uber.trip.v1".
+uber/trip/v1/trip.proto:10:3:Note that enum values use C++ scoping rules, meaning that enum values
+are siblings of their type, not children of it.  Therefore, "CAR" must be unique within
+"uber.trip.v1", not just within "Bar".
+```
+
+- All enum values must have a 0 `INVALID` value.
+  For example, for an enum `TripType`, there must be `TRIP_TYPE_INVALID = 0;`.
+
+
+- The invalid value carries no semantic meaning, and if a value can be purposefully
+  unset, i.e. you think a value should be purposefully null over the wire, then
+  there should be a `UNSET` value as the 1 value.
+  For example, for an enum `TripType`, you may add a value `TRIP_TYPE_UNSET = 1;`.
+
+**[⬆ Back to top](#uber-protobuf-style-guide-v2)**

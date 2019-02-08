@@ -17,3 +17,11 @@ message User {
   string last_name = 3;
   repeated string middle_names = 4;
 }
+
+enum Foo {
+  INVALID = 0;
+}
+
+enum Bar {
+  INVALID = 0;
+}
