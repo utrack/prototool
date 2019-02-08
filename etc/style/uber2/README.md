@@ -29,7 +29,7 @@ As illustrative examples, the following are not acceptable package names.
 // The package sub-name credit_card_analysis is not short, and contains underscores.
 package uber.finance.credit_card_analysis.v1;
 // The package sub-name creditcardanalysis is longer than desired.
-package uber.finance.creditcardanalysis.v1
+package uber.finance.creditcardanalysis.v1;
 ```
 
 The following are acceptable package names.
