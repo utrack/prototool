@@ -187,7 +187,10 @@ response messages. These files have no enforced naming structure or otherwise, h
 recommendation is that if you have less than 15 definitions, they should all go in a file named
 after the last non-version package sub-name. For example, for a package `uber.trip.v1` with less
 than 15 non-service-related definitions, you would have a single supporting file
-`uber/trip/v1/trip.proto`.
+`uber/trip/v1/trip.proto`. While there are arguments for and against the single file
+recommendation, this provides the easiest mechanism to normalize file structure across a repository
+of Protobuf files while making it simple for users to grok a Protobuf package without having to
+change between multiple files, each requiring many imports.
 
 The following is an example of a supporting file with two definitions. Note that it is merely
 coincidence that the file is named `trip.proto` and it contains a definition `Trip` - there is
@@ -285,3 +288,56 @@ message ListUserTripsResponse {
   bool next = 2;
 }
 ```
+
+## Syntax
+
+The syntax for Protobuf files should always be `proto3`. It is acceptable to import `proto2` files
+for legacy purposes, but new definitions should conform to the newer `proto3` standard.
+
+## File Options
+
+File options should be alphabetized. All files should specify a given set of file options that
+largely conform to the [Google Cloud APIs File Structure](https://cloud.google.com/apis/design/file_structure).
+Note that `prototool create` and `prototool format --fix` automate this for you, and this can be done
+as part of your generation pipeline, so there is no need to conform to this manually.
+
+The following are the required file options for a given package `uber.trip.v1` for a file named
+`trip_api.proto`.
+
+```proto
+syntax = "proto3";
+
+package uber.trip.v1;
+
+// The csharp_namespace should be the package name with each package sub-name capitalized.
+option csharp_namespace = "Uber.Trip.V1";
+// The go_package should be the last non-version package sub-name concatenated with the
+// package version.
+//
+// Of special note: For the V1 Style Guide, this was the last package sub-name concatenated
+// with "pb", so for a package "uber.trip", it would be "trippb", but since the V2 Style Guide
+// requires package versions, we have changed "pb" to be the package version.
+option go_package = "tripv1";
+// The java_multiple_files option should always be true.
+option java_multiple_files = true;
+// The java_outer_classname should be the PascalCased file name, removing the "." for the
+// extension.
+option java_outer_classname = "TripApiProto";
+// The java_package should be "com." plus the package name.
+option java_package = "com.uber.trip.v1";
+// The objc_class_prefix should be the uppercase first letter of each package sub-name,
+// not including the package-version, with the following rules:
+//   - If the resulting abbreviation is 2 characters, add "X".
+//   - If the resulting abbreviation is 1 character, add "XX".
+//   - If the resulting abbreviation is "GBP", change it to "GPX". "GBP" is reserved
+//     by Google for the Protocol Buffers implementation.
+option objc_class_prefix = "UTX";
+// The php_namespace is the same as the csharp_namespace, with "\\" substituted for ".".
+option php_namespace = "Uber\\Trip\\V1";
+```
+
+While it is unlikely that a given organization will use all of these file options for their
+generated stubs, this provides a universal mechanism for specifying these options that matches
+the Google Cloud APIs File Structure, and all of these file options are built in.
+
+## Imports
