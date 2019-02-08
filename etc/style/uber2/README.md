@@ -22,7 +22,7 @@ generated stubs in certain languages are less than idiomatic.
 
 As illustrative examples, the following are not acceptable package names.
 
-```
+```proto
 // Note that specifying multiple packages is not valid Protobuf, however
 // we do this here for brevity.
 
@@ -34,7 +34,7 @@ package uber.finance.creditcardanalysis.v1
 
 The following are acceptable package names.
 
-```
+```proto
 // Each package sub-name is short and to the point.
 package uber.trips.watch.v1;
 // Grouping by finance and then payment is acceptable.
