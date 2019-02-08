@@ -347,7 +347,7 @@ a given repository, usually the root of the repository. For local imports, this 
 the package name, so if you have a file `uber/trips/v1/trips.proto` with package `uber.trips.v1`,
 you should import it as `uber/trips/v1/trips.proto`. For external imports, this should generally
 also be the root of the repository. For example, if importing [googleapis](https://github.com/googleapis/googleapis)
-defintions, you would import `google/logging/v2/logging.proto`, not `logging/v2/logging.proto`,
+definitions, you would import `google/logging/v2/logging.proto`, not `logging/v2/logging.proto`,
 `v2/logging.proto`, and such.
 
 Note that the
