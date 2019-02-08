@@ -15,6 +15,8 @@ This is the second version of the Uber Protobuf Style Guide.
 
 See the [uber](uber) directory for an example of all concepts explained in this Style Guide.
 
+**[⬆ back to top](#uber-protobuf-style-guide-v2)**
+
 ## Package Naming
 
 Some conventions:
@@ -51,6 +53,8 @@ package uber.finance.payment.v1;
 // Ccap is for credit card analysis processing.
 package uber.finance.ccap.v1;
 ```
+
+**[⬆ back to top](#uber-protobuf-style-guide-v2)**
 
 ## Package Versioning
 
@@ -144,6 +148,8 @@ necessary. For example, copy `foo.bar.v1` to `foo.bar.v2`, and do any cleanups r
 This is not a breaking change as `foo.bar.v2` is a new package. Of course, you are responsible
 for the migration of your callers.
 
+**[⬆ back to top](#uber-protobuf-style-guide-v2)**
+
 ## Directory Structure
 
 Files should be stored in a directory structure that matches their package sub-names. All files
@@ -171,6 +177,8 @@ The following is an example of this in practice.
             ├── trip_api.proto // package uber.trip.v2
             └── trip.proto // pacakge uber.trip.v2
 ```
+
+**[⬆ back to top](#uber-protobuf-style-guide-v2)**
 
 ## File Structure
 
@@ -298,10 +306,14 @@ message ListUserTripsResponse {
 }
 ```
 
+**[⬆ back to top](#uber-protobuf-style-guide-v2)**
+
 ## Syntax
 
 The syntax for Protobuf files should always be `proto3`. It is acceptable to import `proto2` files
 for legacy purposes, but new definitions should conform to the newer `proto3` standard.
+
+**[⬆ back to top](#uber-protobuf-style-guide-v2)**
 
 ## File Options
 
@@ -349,6 +361,8 @@ While it is unlikely that a given organization will use all of these file option
 generated stubs, this provides a universal mechanism for specifying these options that matches
 the Google Cloud APIs File Structure, and all of these file options are built in.
 
+**[⬆ back to top](#uber-protobuf-style-guide-v2)**
+
 ## Imports
 
 Imports should be alphabetized. Imports should all start from the same base directory for
@@ -387,3 +401,5 @@ These are available for browsing at
 [github.com/protocolbuffers/protobuf/src/google/protobuf](https://github.com/protocolbuffers/protobuf/tree/master/src/google/protobuf)
 and are also includeed in the `include` directory of each [Protobuf Releases ZIP
 file](https://github.com/protocolbuffers/protobuf/releases).
+
+**[⬆ back to top](#uber-protobuf-style-guide-v2)**
