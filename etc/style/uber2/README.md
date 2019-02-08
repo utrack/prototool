@@ -2,6 +2,15 @@
 
 This is the second version of the Uber Protobuf Style Guide.
 
+  * [Example](#example)
+  * [Package Naming](#package-naming)
+  * [Package Versioning](#package-versioning)
+  * [Directory Structure](#directory-structure)
+  * [File Structure](#file-structure)
+  * [Syntax](#syntax)
+  * [File Options](#file-options)
+  * [Imports](#imports)
+
 ## Example
 
 See the [uber](uber) directory for an example of all concepts explained in this Style Guide.
