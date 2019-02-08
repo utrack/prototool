@@ -10,8 +10,8 @@ See the [uber](uber) directory for an example of all concepts explained in this 
 
 Some conventions:
 
-- A **package name** as the full package name, i.e. `foo.bar.baz.v1`.
-- A **package sub-name** as a part of a package name, ie `foo`, `bar`, or `baz`.
+- A **package name** as the full package name, i.e. `uber.trip.v1`.
+- A **package sub-name** as a part of a package name, ie `uber`, `trip`, or `v1`.
 - A **package version** is the last package sub-name that specifies the version,
   i.e. `v1`, `v1beta1`, or `v2`.
 
@@ -36,7 +36,7 @@ The following are acceptable package names.
 
 ```proto
 // Each package sub-name is short and to the point.
-package uber.trips.watch.v1;
+package uber.trip.v1;
 // Grouping by finance and then payment is acceptable.
 package uber.finance.payment.v1;
 // Ccap is for credit card analysis processing.
@@ -50,23 +50,23 @@ followed by the beta version, specified as `vMAJOR` or `vMAJORbetaBETA`, where `
 are both greater than 0. The following are examples of acceptable package names.
 
 ```proto
-package foo.bar.v1beta1;
-package foo.bar.v1beta2;
-package foo.bar.v1;
-package foo.bar.v2beta1;
-package foo.bar.v2;
-package bar.v2;
+package uber.trip.v1beta1;
+package uber.trip.v1beta2;
+package uber.trip.v1;
+package uber.trip.v2beta1;
+package uber.trip.v2;
+package something.v2;
 ```
 
 As illustrative examples, the following are not acceptable package names.
 
 ```proto
 // No version.
-package foo.bar;
+package uber.trip;
 // Major version is not greater than 0.
-package foo.bar.v0;
+package uber.trip.v0;
 // Beta version is not greater than 0.
-package foo.bar.v1beta0;
+package uber.trip.v1beta0;
 ```
 
 Packages with only a major version are considered **stable** packages, and packages with a major
@@ -154,26 +154,134 @@ The following is an example of this in practice.
     │       │   └── payment.proto // package uber.payment.v1
     │       └── v1beta1
     │           └── payment.proto // package uber.payment.v1beta1
-    └── trips
-        └── watch
-            ├── v1
-            │   ├── trip_watcher_api.proto // package uber.trips.watch.v1
-            │   └── watch.proto // package uber.trips.watch.v1
-            └── v2
-                ├── trip_watcher_api.proto // package uber.trips.watch.v2
-                └── watch.proto // pacakge uber.trips.watch.v2
+    └── trip
+        ├── v1
+        │   ├── trip_api.proto // package uber.trip.v1
+        │   └── trip.proto // package uber.trip.v1
+        └── v2
+            ├── trip_api.proto // package uber.trip.v2
+            └── trip.proto // pacakge uber.trip.v2
 ```
 
 ## File Structure
 
-Protobuf definitions should go into one of two types of files: **Service files** or **Supporting files**.
+All files should be ordered in the following manner.
+
+   1. License Header (if applicable)
+   2. Syntax
+   3. Package
+   4. File options (alphabetized)
+   5. Imports (alphabetized)
+   6. Everything Else
+
+Protobuf definitions should go into one of two types of files: **Service files** or
+**Supporting files**.
 
 A service file contains exactly one service, and it's corresponding request and response messages.
-This file is named after the service, substituting PascalCase for lower_snake_case. The service
+This file is named after the service, substituting `PascalCase` for `lower_snake_case`. The service
 should be the first element in the file, with requests and responses sorted to match the order
 of the declared service methods.
 
-The following is an example of a service file named `trip_watcher_api.proto`.
+A supporting file contains everything else, i.e. enums, and messages that are not request or
+response messages. These files have no enforced naming structure or otherwise, however the general
+recommendation is that if you have less than 15 definitions, they should all go in a file named
+after the last non-version package sub-name. For example, for a package `uber.trip.v1` with less
+than 15 non-service-related definitions, you would have a single supporting file
+`uber/trip/v1/trip.proto`.
+
+The following is an example of a supporting file with two definitions. Note that it is merely
+coincidence that the file is named `trip.proto` and it contains a definition `Trip` - there is
+no need to name files by a type or types contained within them, other than for services.
 
 ```proto
+syntax = "proto3";
+
+package uber.trip.v1;
+
+option csharp_namespace = "Uber.Trip.V1";
+option go_package = "tripv1";
+option java_multiple_files = true;
+option java_outer_classname = "TripProto";
+option java_package = "com.uber.trip.v1";
+option objc_class_prefix = "UTX";
+option php_namespace = "Uber\\Trip\\V1";
+
+import "uber/user/v1/user.proto";
+import "google/protobuf/timestamp.proto";
+
+// A trip taken by a rider.
+message Trip {
+  string id = 1;
+  user.v1.User user = 2;
+  google.protobuf.Timestamp start_time = 3;
+  google.protobuf.Timestamp end_time = 4;
+  repeated Waypoint waypoints = 5;
+}
+
+// A given waypoint.
+message Waypoint {
+  // In the real world, addresses would be normalized into
+  // a PostalAddress message or such, but for brevity we simplify
+  // this to a freeform string.
+  string postal_address = 1;
+  // The nickname of this waypoint, if any.
+  string nickname = 2;
+}
+```
+
+The following is an example of a service file named `uber/trip/v1/trip_api.proto` showing a service
+`TripAPI` with two service methods, and requests and responses ordered by method. Note that
+request and response messages do not require comments.
+
+```proto
+syntax = "proto3";
+
+package uber.trip.v1;
+
+option csharp_namespace = "Uber.Trip.V1";
+option go_package = "tripv1";
+option java_multiple_files = true;
+option java_outer_classname = "TripApiProto";
+option java_package = "com.uber.trip.v1";
+option objc_class_prefix = "UTX";
+option php_namespace = "Uber\\Trip\\V1";
+
+import "uber/trip/v1/trip.proto";
+import "google/protobuf/timestamp.proto";
+
+// Handles interaction with trips.
+service TripAPI {
+  // Get the trip specified by the ID.
+  rpc GetTrip(GetTripRequest) returns (GetTripResponse);
+  // List the trips for the given user before a given time.
+  //
+  // If the start index is beyond the end of the available number
+  // of trips, an empty list of trips will be returned.
+  // If the start index plus the size is beyond the available number
+  // of trips, only the number of available trips will be returned.
+  rpc ListUserTrips(ListUserTripsRequest) returns (ListUserTripsResponse);
+}
+
+message GetTripRequest {
+  string id = 1;
+}
+
+message GetTripResponse {
+  Trip trip = 1;
+}
+
+message ListUserTripsRequest {
+  string user_id = 1;
+  google.protobuf.Timestamp before_time = 2;
+  // The start index for pagination.
+  uint64 start = 3;
+  // The maximum number of trips to return.
+  uint64 max_size = 4;
+}
+
+message ListUserTripsResponse {
+  repeated Trip trips = 1;
+  // True if more trips are available.
+  bool next = 2;
+}
 ```

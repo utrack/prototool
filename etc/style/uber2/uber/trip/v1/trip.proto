@@ -19,4 +19,15 @@ message Trip {
   user.v1.User user = 2;
   google.protobuf.Timestamp start_time = 3;
   google.protobuf.Timestamp end_time = 4;
+  repeated Waypoint waypoints = 5;
+}
+
+// A given waypoint.
+message Waypoint {
+  // In the real world, addresses would be normalized into
+  // a PostalAddress message or such, but for brevity we simplify
+  // this to a freeform string.
+  string postal_address = 1;
+  // The nickname of this waypoint, if any.
+  string nickname = 2;
 }
