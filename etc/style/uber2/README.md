@@ -429,6 +429,7 @@ enum Foo {
 }
 
 enum Bar {
+  // Invalid! There is already a CAR enum value in uber.trip.v1.
   CAR = 0;
 }
 ```
