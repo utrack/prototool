@@ -10,9 +10,9 @@ See the [uber](uber) directory for an example of all concepts explained in this 
 
 Some conventions:
 
-- A "package name" as the full package name, i.e. `foo.bar.baz.v1`.
-- A "package sub-name" as a part of a package name, ie `foo`, `bar`, or `baz`.
-- A "package version" is the last package sub-name that specifies the version,
+- A **package name** as the full package name, i.e. `foo.bar.baz.v1`.
+- A **package sub-name** as a part of a package name, ie `foo`, `bar`, or `baz`.
+- A **package version** is the last package sub-name that specifies the version,
   i.e. `v1`, `v1beta1`, or `v2`.
 
 Package sub-names should be short and descriptive, and can use abbreviations if necesary.
