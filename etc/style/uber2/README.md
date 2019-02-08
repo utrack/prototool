@@ -341,3 +341,40 @@ generated stubs, this provides a universal mechanism for specifying these option
 the Google Cloud APIs File Structure, and all of these file options are built in.
 
 ## Imports
+
+Imports should be alphabetized. Imports should all start from the same base directory for
+a given repository, usually the root of the repository. For local imports, this should match
+the package name, so if you have a file `uber/trips/v1/trips.proto` with package `uber.trips.v1`,
+you should import it as `uber/trips/v1/trips.proto`. For external imports, this should generally
+also be the root of the repository. For example, if importing [googleapis](https://github.com/googleapis/googleapis)
+defintions, you would import `google/logging/v2/logging.proto`, not `logging/v2/logging.proto`,
+`v2/logging.proto`, and such.
+
+Note that the
+[Well-Known Types](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf)
+should be used whenever possible, and imported starting with `google/protobuf`, for example
+`google/protobuf/timestamp.proto`. Prototool provides all of these out of the box for you.
+
+```
+.
+└── google
+    └── protobuf
+        ├── any.proto
+        ├── api.proto
+        ├── compiler
+        │   └── plugin.proto
+        ├── descriptor.proto
+        ├── duration.proto
+        ├── empty.proto
+        ├── field_mask.proto
+        ├── source_context.proto
+        ├── struct.proto
+        ├── timestamp.proto
+        ├── type.proto
+        └── wrappers.proto
+```
+
+These are available for browsing at
+[github.com/protocolbuffers/protobuf/src/google/protobuf](https://github.com/protocolbuffers/protobuf/tree/master/src/google/protobuf)
+and are also includeed in the `include` directory of each [Protobuf Releases ZIP
+file](https://github.com/protocolbuffers/protobuf/releases).
