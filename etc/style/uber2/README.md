@@ -28,8 +28,8 @@ As illustrative examples, the following are not acceptable package names.
 
 // The package sub-name credit_card_analysis is not short, and contains underscores.
 package uber.finance.credit_card_analysis.v1;
-// The package sub-name creditcardanalysis is longer than desired.
-package uber.finance.creditcardanalysis.v1;
+// The package sub-name creditcardanalysisprocessing is longer than desired.
+package uber.finance.creditcardanalysisprocessing.v1;
 ```
 
 The following are acceptable package names.
@@ -39,8 +39,8 @@ The following are acceptable package names.
 package uber.trips.watch.v1;
 // Grouping by finance and then payment is acceptable.
 package uber.finance.payment.v1;
-// Cca is for credit card analysis.
-package uber.finance.cca.v1;
+// Ccap is for credit card analysis processing.
+package uber.finance.ccap.v1;
 ```
 
 ## Package Versioning
@@ -146,9 +146,9 @@ The following is an example of this in practice.
 .
 └── uber
     ├── finance
-    │   ├── cca
+    │   ├── ccap
     │   │   └── v1
-    │   │       └── cca.proto // package uber.finance.cca.v1
+    │   │       └── ccap.proto // package uber.finance.ccap.v1
     │   └── payment
     │       ├── v1
     │       │   └── payment.proto // package uber.payment.v1
