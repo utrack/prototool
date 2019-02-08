@@ -163,3 +163,17 @@ The following is an example of this in practice.
                 ├── trip_watcher_api.proto // package uber.trips.watch.v2
                 └── watch.proto // pacakge uber.trips.watch.v2
 ```
+
+## File Structure
+
+Protobuf definitions should go into one of two types of files: **Service files** or **Supporting files**.
+
+A service file contains exactly one service, and it's corresponding request and response messages.
+This file is named after the service, substituting PascalCase for lower_snake_case. The service
+should be the first element in the file, with requests and responses sorted to match the order
+of the declared service methods.
+
+The following is an example of a service file named `trip_watcher_api.proto`.
+
+```proto
+```
