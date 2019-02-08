@@ -412,7 +412,7 @@ The enum option `allow_aliases` should never be used.
 
 Enum values have strict naming requirements.
 
-- All enum values must have the name of the enum prefixed to all values as `UPPER_SNAKE_CASE`.
+1. All enum values must have the name of the enum prefixed to all values as `UPPER_SNAKE_CASE`.
   For example, for an enum `TripType`, all values must be prefixed with `TRIP_TYPE_`.
 
 This is due to Protobuf enums using C++ scoping rules. This results in it not being
@@ -443,11 +443,11 @@ are siblings of their type, not children of it.  Therefore, "CAR" must be unique
 "uber.trip.v1", not just within "Bar".
 ```
 
-- All enum values must have a 0 `INVALID` value.
+2. All enum values must have a 0 `INVALID` value.
   For example, for an enum `TripType`, there must be `TRIP_TYPE_INVALID = 0;`.
 
 
-- The invalid value carries no semantic meaning, and if a value can be purposefully
+3. The invalid value carries no semantic meaning, and if a value can be purposefully
   unset, i.e. you think a value should be purposefully null over the wire, then
   there should be a `UNSET` value as the 1 value.
   For example, for an enum `TripType`, you may add a value `TRIP_TYPE_UNSET = 1;`.
