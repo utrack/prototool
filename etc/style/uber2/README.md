@@ -2,7 +2,6 @@
 
 This is the second version of the Uber Protobuf Style Guide.
 
-  * [Example](#example)
   * [Package Naming](#package-naming)
   * [Package Versioning](#package-versioning)
   * [Directory Structure](#directory-structure)
@@ -11,11 +10,11 @@ This is the second version of the Uber Protobuf Style Guide.
   * [File Options](#file-options)
   * [Imports](#imports)
 
-## Example
-
 See the [uber](uber) directory for an example of all concepts explained in this Style Guide.
 
-**[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+Note that for documentation purposes, there are commenting requirements, however these are
+separated into sections towards the end of this document so that we concentrate on the
+Protobuf definition structure first. Please make sure you take careful note of these requirements.
 
 ## Package Naming
 
@@ -403,3 +402,9 @@ and are also includeed in the `include` directory of each [Protobuf Releases ZIP
 file](https://github.com/protocolbuffers/protobuf/releases).
 
 **[⬆ Back to top](#uber-protobuf-style-guide-v2)**
+
+## Enums
+
+Enums should always be `PascalCase`.
+
+Enum
