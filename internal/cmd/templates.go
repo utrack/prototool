@@ -58,6 +58,24 @@ var (
 		},
 	}
 
+	bazelGenerateCmdTemplate = &cmdTemplate{
+		Use:   "generate [dir]",
+		Short: "Generate Bazel files.",
+		Args:  cobra.MaximumNArgs(1),
+		Run: func(runner exec.Runner, args []string, flags *flags) error {
+			return runner.BazelGenerate(args)
+		},
+		BindFlags: func(flagSet *pflag.FlagSet, flags *flags) {
+			flags.bindCachePath(flagSet)
+			flags.bindConfigData(flagSet)
+			flags.bindErrorFormat(flagSet)
+			flags.bindJSON(flagSet)
+			flags.bindProtocURL(flagSet)
+			flags.bindProtocBinPath(flagSet)
+			flags.bindProtocWKTPath(flagSet)
+		},
+	}
+
 	breakCheckCmdTemplate = &cmdTemplate{
 		Use:   "check [dir]",
 		Short: "Check for breaking changes.",

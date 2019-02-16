@@ -61,6 +61,7 @@ type Runner interface {
 	InspectPackageDeps(args []string, name string) error
 	InspectPackageImporters(args []string, name string) error
 	BreakCheck(args []string, gitBranch string, gitTag string, includeBeta bool, allowBetaDeps bool) error
+	BazelGenerate(args []string) error
 }
 
 // RunnerOption is an option for a new Runner.

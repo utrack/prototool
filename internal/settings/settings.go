@@ -51,6 +51,19 @@ var (
 		"prototool.json",
 	}
 
+	// ValidBazelRuleNames are all valid Bazel rule names.
+	ValidBazelRuleNames = map[string]struct{}{
+		"cc_proto_library":        struct{}{},
+		"java_lite_proto_library": struct{}{},
+		"java_proto_library":      struct{}{},
+	}
+
+	// ValidBazelVisibilityAliases are all valid Bazel visibility aliases.
+	ValidBazelVisibilityAliases = map[string]struct{}{
+		"public":      struct{}{},
+		"subpackages": struct{}{},
+	}
+
 	_genPluginTypeToString = map[GenPluginType]string{
 		GenPluginTypeNone: "",
 		GenPluginTypeGo:   "go",
@@ -125,7 +138,8 @@ func ParseGenPluginType(s string) (GenPluginType, error) {
 // all other internal packages should verify that all given paths are
 // absolute, except for the internal/text package.
 type Config struct {
-	// The working directory path.
+	// The directory path of the config file, or the working directory path.
+	// if no config file exists.
 	// Expected to be absolute path.
 	DirPath string
 	// The prefixes to exclude.
@@ -142,6 +156,8 @@ type Config struct {
 	Lint LintConfig
 	// The gen config.
 	Gen GenConfig
+	// The Bazel config.
+	Bazel BazelConfig
 }
 
 // CompileConfig is the compile config.
@@ -259,6 +275,27 @@ type GenPlugin struct {
 	IncludeSourceInfo bool
 }
 
+// BazelConfig is the Bazel config.
+type BazelConfig struct {
+	Gen BazelGenConfig
+}
+
+// BazelGenConfig is the Bazel generate config.
+type BazelGenConfig struct {
+	ProtoLibraryVisibilityAlias     string
+	ProtoLibraryFileVisibilityAlias string
+	// The rules to generate.
+	// Does not include "proto_library", this is always generated.
+	// Sorted by name.
+	Rules []BazelGenRule
+}
+
+// BazelGenRule is a Bazel rule to generate.
+type BazelGenRule struct {
+	Name            string
+	VisibilityAlias string
+}
+
 // OutputPath is an output path.
 //
 // We need the relative path for go package references for generation.
@@ -305,7 +342,7 @@ type ExternalConfig struct {
 		// devel-mode only
 		AllowSuppression bool `json:"allow_suppression,omitempty" yaml:"allow_suppression,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
-	Gen struct {
+	Generate struct {
 		GoOptions struct {
 			ImportPath     string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`
 			ExtraModifiers map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`
@@ -321,6 +358,16 @@ type ExternalConfig struct {
 			IncludeSourceInfo bool   `json:"include_source_info,omitempty" yaml:"include_source_info,omitempty"`
 		} `json:"plugins,omitempty" yaml:"plugins,omitempty"`
 	} `json:"generate,omitempty" yaml:"generate,omitempty"`
+	Bazel struct {
+		Generate struct {
+			ProtoLibraryVisibilityAlias     string `json:"proto_library_visibility_alias,omitempty" yaml:"proto_library_visibility_alias,omitempty"`
+			ProtoLibraryFileVisibilityAlias string `json:"proto_library_file_visibility_alias,omitempty" yaml:"proto_library_file_visibility_alias,omitempty"`
+			Rules                           []struct {
+				Name            string `json:"name,omitempty" yaml:"name,omitempty"`
+				VisibilityAlias string `json:"visibility_alias,omitempty" yaml:"visibility_alias,omitempty"`
+			} `json:"rules,omitempty" yaml:"rules,omitempty"`
+		} `json:"generate,omitempty" yaml:"generate,omitempty"`
+	} `json:"bazel,omitempty" yaml:"bazel,omitempty"`
 }
 
 // ConfigProvider provides Configs.

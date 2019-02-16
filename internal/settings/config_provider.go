@@ -203,7 +203,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		return Config{}, err
 	}
 	includePaths := make([]string, 0, len(e.Protoc.Includes))
-	for _, includePath := range strs.DedupeSort(e.Protoc.Includes, nil) {
+	for _, includePath := range strs.SortUniq(e.Protoc.Includes) {
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
@@ -225,8 +225,8 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		}
 	}
 
-	genPlugins := make([]GenPlugin, len(e.Gen.Plugins))
-	for i, plugin := range e.Gen.Plugins {
+	genPlugins := make([]GenPlugin, len(e.Generate.Plugins))
+	for i, plugin := range e.Generate.Plugins {
 		genPluginType, err := ParseGenPluginType(plugin.Type)
 		if err != nil {
 			return Config{}, err
@@ -271,6 +271,41 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		}
 	}
 	sort.Slice(genPlugins, func(i int, j int) bool { return genPlugins[i].Name < genPlugins[j].Name })
+
+	bazelConfig := BazelConfig{
+		Gen: BazelGenConfig{
+			ProtoLibraryVisibilityAlias:     e.Bazel.Generate.ProtoLibraryVisibilityAlias,
+			ProtoLibraryFileVisibilityAlias: e.Bazel.Generate.ProtoLibraryFileVisibilityAlias,
+			Rules:                           make([]BazelGenRule, 0, len(e.Bazel.Generate.Rules)),
+		},
+	}
+	if bazelConfig.Gen.ProtoLibraryVisibilityAlias != "" {
+		if _, ok := ValidBazelVisibilityAliases[bazelConfig.Gen.ProtoLibraryVisibilityAlias]; !ok {
+			return Config{}, fmt.Errorf("unknown bazel visibility alias: %s", bazelConfig.Gen.ProtoLibraryVisibilityAlias)
+		}
+	}
+	if bazelConfig.Gen.ProtoLibraryFileVisibilityAlias != "" {
+		if _, ok := ValidBazelVisibilityAliases[bazelConfig.Gen.ProtoLibraryFileVisibilityAlias]; !ok {
+			return Config{}, fmt.Errorf("unknown bazel visibility alias: %s", bazelConfig.Gen.ProtoLibraryFileVisibilityAlias)
+		}
+	}
+	for _, rule := range e.Bazel.Generate.Rules {
+		bazelConfig.Gen.Rules = append(bazelConfig.Gen.Rules, BazelGenRule{
+			Name:            rule.Name,
+			VisibilityAlias: rule.VisibilityAlias,
+		})
+	}
+	sort.Slice(bazelConfig.Gen.Rules, func(i int, j int) bool { return bazelConfig.Gen.Rules[i].Name < bazelConfig.Gen.Rules[j].Name })
+	for _, rule := range bazelConfig.Gen.Rules {
+		if _, ok := ValidBazelRuleNames[rule.Name]; !ok {
+			return Config{}, fmt.Errorf("unknown bazel rule name: %s", rule.Name)
+		}
+		if rule.VisibilityAlias != "" {
+			if _, ok := ValidBazelVisibilityAliases[rule.VisibilityAlias]; !ok {
+				return Config{}, fmt.Errorf("unknown bazel visibility alias: %s", rule.VisibilityAlias)
+			}
+		}
+	}
 
 	createDirPathToBasePackage := make(map[string]string)
 	for _, pkg := range e.Create.Packages {
@@ -345,8 +380,8 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			DirPathToBasePackage: createDirPathToBasePackage,
 		},
 		Lint: LintConfig{
-			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
-			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			IncludeIDs:          strs.SortUniqModify(e.Lint.Rules.Add, strings.ToUpper),
+			ExcludeIDs:          strs.SortUniqModify(e.Lint.Rules.Remove, strings.ToUpper),
 			Group:               strings.ToLower(e.Lint.Group),
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
@@ -355,11 +390,12 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
-				ImportPath:     e.Gen.GoOptions.ImportPath,
-				ExtraModifiers: e.Gen.GoOptions.ExtraModifiers,
+				ImportPath:     e.Generate.GoOptions.ImportPath,
+				ExtraModifiers: e.Generate.GoOptions.ExtraModifiers,
 			},
 			Plugins: genPlugins,
 		},
+		Bazel: bazelConfig,
 	}
 
 	for _, genPlugin := range config.Gen.Plugins {
@@ -403,7 +439,7 @@ func getExcludePrefixesForDir(dirPath string) ([]string, error) {
 
 func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
 	excludePrefixes := make([]string, 0, len(excludes))
-	for _, excludePrefix := range strs.DedupeSort(excludes, nil) {
+	for _, excludePrefix := range strs.SortUniq(excludes) {
 		if !filepath.IsAbs(excludePrefix) {
 			excludePrefix = filepath.Join(dirPath, excludePrefix)
 		}

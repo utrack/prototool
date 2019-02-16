@@ -122,6 +122,9 @@ func getRootCommand(develMode bool, exitCodeAddr *int, args []string, stdin io.R
 	breakCmd := &cobra.Command{Use: "break", Short: "Top-level command for breaking change commands."}
 	breakCmd.AddCommand(breakCheckCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
 	rootCmd.AddCommand(breakCmd)
+	bazelCmd := &cobra.Command{Use: "bazel", Short: "Top-level command for bazel commands."}
+	bazelCmd.AddCommand(bazelGenerateCmdTemplate.Build(develMode, exitCodeAddr, stdin, stdout, stderr, flags))
+	rootCmd.AddCommand(bazelCmd)
 
 	// flags bound to rootCmd are global flags
 	flags.bindDebug(rootCmd.PersistentFlags())

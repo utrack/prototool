@@ -37,6 +37,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/uber/prototool/internal/bazel"
 	"github.com/uber/prototool/internal/breaking"
 	"github.com/uber/prototool/internal/cfginit"
 	"github.com/uber/prototool/internal/create"
@@ -591,6 +592,31 @@ func (r *runner) InspectPackageImporters(args []string, name string) error {
 	return r.printPackageNames(pkg.ImporterNameToImporter())
 }
 
+func (r *runner) BazelGenerate(args []string) error {
+	meta, err := r.getMeta(args)
+	if err != nil {
+		return err
+	}
+	r.printAffectedFiles(meta)
+	fileDescriptorSets, err := r.compile(false, true, false, meta)
+	if err != nil {
+		return err
+	}
+	if len(fileDescriptorSets) == 0 {
+		return fmt.Errorf("no FileDescriptorSets returned")
+	}
+	outputs, err := r.newBazelGenerator().Generate(fileDescriptorSets)
+	if err != nil {
+		return err
+	}
+	for _, output := range outputs {
+		if err := ioutil.WriteFile(output.FilePath, output.Data, 0644); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (r *runner) BreakCheck(args []string, gitBranch string, gitTag string, includeBeta bool, allowBetaDeps bool) error {
 	if moreThanOneSet(gitBranch != "", gitTag != "") {
 		return newExitErrorf(255, "can only set one of git-branch, git-tag")
@@ -857,6 +883,13 @@ func (r *runner) newGRPCHandler(
 		handlerOptions = append(handlerOptions, grpc.HandlerWithKeepaliveTime(keepaliveTime))
 	}
 	return grpc.NewHandler(handlerOptions...)
+}
+
+func (r *runner) newBazelGenerator() bazel.Generator {
+	generatorOptions := []bazel.GeneratorOption{
+		bazel.GeneratorWithLogger(r.logger),
+	}
+	return bazel.NewGenerator(generatorOptions...)
 }
 
 type meta struct {

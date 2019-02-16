@@ -23,6 +23,7 @@ package file
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/uber/prototool/internal/settings"
@@ -48,15 +49,14 @@ type ProtoSet struct {
 	// All paths must be absolute.
 	// All paths must reside within DirPath.
 	// Must be cleaned.
-	// The directory paths will always reside within DirPath,
-	// that is filepath.Rel(ProtoSetDirPath, DirPath) will never return
+	// The directory paths will always reside within the config DirPath,
+	// that is filepath.Rel(Config.DirPath, DirPath) will never return
 	// error and always return a non-empty string. Note the string could be ".".
 	// The ProtoFiles will always be in the directory specified by the key.
 	DirPathToFiles map[string][]*ProtoFile
 	// The associated Config.
 	// Must be valid.
-	// The DirPath on the config may differ from the DirPath
-	// on the ProtoSet.
+	// The DirPath on the config may differ from the DirPath on the ProtoSet.
 	Config settings.Config
 }
 
@@ -150,4 +150,13 @@ func CheckAbs(path string) error {
 		return fmt.Errorf("expected absolute path but was %s", path)
 	}
 	return nil
+}
+
+// BaseStrippedFileName gets the filename with directory and extension stripped.
+func BaseStrippedFileName(filePath string) string {
+	if filePath == "" {
+		return ""
+	}
+	base := filepath.Base(filePath)
+	return strings.TrimSuffix(base, filepath.Ext(base))
 }
