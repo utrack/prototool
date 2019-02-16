@@ -27,3 +27,6 @@
 /prototool.iml
 /release
 /vendor
+
+/protobuf-bug/.tmp/
+/protobuf-bug/bazel-*
