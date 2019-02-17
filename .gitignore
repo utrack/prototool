@@ -5,6 +5,7 @@
 /brew
 /etc/docker/testing/gen
 /example/gen/java
+/example/proto/bazel-*
 /cmd/prototool/prototool
 /internal/cmd/gen-prototool-bash-completion/gen-prototool-bash-completion
 /internal/cmd/gen-prototool-zsh-completion/gen-prototool-zsh-completion

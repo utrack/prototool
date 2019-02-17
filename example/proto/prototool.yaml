@@ -18,3 +18,9 @@ generate:
       output: ../gen/go
     - name: java
       output: ../gen/java
+bazel:
+  generate:
+    rules:
+      - name: cc_proto_library
+      - name: java_proto_library
+      - name: java_lite_proto_library

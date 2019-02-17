@@ -74,6 +74,8 @@ example: install
 	go build -o $(TMP_ETC)/excited ./example/cmd/excited/main.go
 	prototool lint etc/style/google
 	prototool lint etc/style/uber1
+	cd example/proto; prototool bazel generate
+	cd example/proto; bazel build //...:all
 
 .PHONY: internalgen
 internalgen: install
