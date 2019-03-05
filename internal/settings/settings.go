@@ -125,7 +125,8 @@ func ParseGenPluginType(s string) (GenPluginType, error) {
 // all other internal packages should verify that all given paths are
 // absolute, except for the internal/text package.
 type Config struct {
-	// The working directory path.
+	// The directory path of the config file, or the working directory path.
+	// if no config file exists.
 	// Expected to be absolute path.
 	DirPath string
 	// The prefixes to exclude.
@@ -198,6 +199,11 @@ type LintConfig struct {
 	// header before the syntax declaration. Note that format --fix will delete
 	// anything before the syntax declaration if this is set.
 	FileHeader string
+	// JavaPackagePrefix is the prefix for java packages. This only has an
+	// effect if the linter FILE_OPTIONS_EQUAL_JAVA_PACKAGE_PREFIX is turned on.
+	// This also affects create and format --fix.
+	// The default behavior is to use "com".
+	JavaPackagePrefix string
 	// AllowSuppression says to honor @suppresswarnings annotations.
 	AllowSuppression bool
 }
@@ -291,20 +297,22 @@ type ExternalConfig struct {
 		Ignores []struct {
 			ID    string   `json:"id,omitempty" yaml:"id,omitempty"`
 			Files []string `json:"files,omitempty" yaml:"files,omitempty"`
-		}
+		} `json:"ignores,omitempty" yaml:"ignores,omitempty"`
 		Rules struct {
 			NoDefault bool     `json:"no_default,omitempty" yaml:"no_default,omitempty"`
 			Add       []string `json:"add" yaml:"add"`
 			Remove    []string `json:"remove" yaml:"remove"`
-		}
+		} `json:"rules,omitempty" yaml:"rules,omitempty"`
 		FileHeader struct {
 			Path        string `json:"path,omitempty" yaml:"path,omitempty"`
+			Content     string `json:"content,omitempty" yaml:"content,omitempty"`
 			IsCommented bool   `json:"is_commented,omitempty" yaml:"is_commented,omitempty"`
 		} `json:"file_header,omitempty" yaml:"file_header,omitempty"`
+		JavaPackagePrefix string `json:"java_package_prefix,omitempty" yaml:"java_package_prefix,omitempty"`
 		// devel-mode only
 		AllowSuppression bool `json:"allow_suppression,omitempty" yaml:"allow_suppression,omitempty"`
 	} `json:"lint,omitempty" yaml:"lint,omitempty"`
-	Gen struct {
+	Generate struct {
 		GoOptions struct {
 			ImportPath     string            `json:"import_path,omitempty" yaml:"import_path,omitempty"`
 			ExtraModifiers map[string]string `json:"extra_modifiers,omitempty" yaml:"extra_modifiers,omitempty"`

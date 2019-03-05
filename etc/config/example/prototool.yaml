@@ -1,4 +1,6 @@
 # Paths to exclude when searching for Protobuf files.
+# These can either be file or directory names.
+# If there is a directory name, that directory and all sub-directories will be excluded.
 excludes:
   - path/to/a
   - path/to/b/file.proto
@@ -44,6 +46,8 @@ lint:
   group: uber2
 
   # Linter files to ignore.
+  # These can either be file or directory names.
+  # If there is a directory name, that directory and all sub-directories will be ignored.
   ignores:
     - id: RPC_NAMES_CAMEL_CASE
       files:
@@ -51,7 +55,7 @@ lint:
         - path/to/bar.proto
     - id: SYNTAX_PROTO3
       files:
-        - path/to/foo.proto
+        - path/to/dir
 
   # Linter rules.
   # Run prototool lint --list-all-linters to see all available linters.
@@ -71,19 +75,32 @@ lint:
     remove:
       - ENUM_NAMES_CAMEL_CASE
 
-  # The path to the file header for all Protobuf files.
-  # If this is set and the FILE_HEADER linter is turned on, files will
-  # be checked to begin with the contents of this file, and format --fix
+  # The path to the file header or the file header content for all Protobuf files.
+  # If either path or content is set and the FILE_HEADER linter is turned on,
+  # files will be checked to begin with the given header, and format --fix
   # will place this header before the syntax declaration. Note that
   # format --fix will delete anything before the syntax declaration
   # if this is set.
+  #
+  # Set path to use a file's contents for the header. Path must be relative.
+  # Set content to directly specify the header.
+  # **Both path and content cannot be set at the same time. They are only done
+  # so here for example purposes.**
   #
   # If is_commented is set, this file is assumed to already have comments
   # and will be added directly. If is_commented is not set, "// " will be
   # added before every line.
   file_header:
     path: path/to/protobuf_file_header.txt
+    content: |
+      //
+      // Acme, Inc. (c) 2019
+      //
     is_commented: true
+  # Override the default java_package file option prefix of "com".
+  # If this is set, this will affect lint, create, and format --fix to use.
+  # this prefix instead of "com".
+  java_package_prefix: au.com
 
 # Code generation directives.
 generate:

@@ -204,6 +204,12 @@ func TestLint(t *testing.T) {
 		8:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_COM_PREFIX`,
 		"testdata/lint/fileoptions/file_options_incorrect.proto",
 	)
+	assertDoLintFile(
+		t,
+		false,
+		`9:1:FILE_OPTIONS_EQUAL_JAVA_PACKAGE_PREFIX`,
+		"testdata/lint/fileoptionsjava/file_options_incorrect.proto",
+	)
 	assertDoLintFiles(
 		t,
 		false,
@@ -501,6 +507,18 @@ func TestLint(t *testing.T) {
 	assertDoLintFile(
 		t,
 		false,
+		`14:3:MESSAGE_FIELD_NAMES_NO_DESCRIPTOR
+		18:3:MESSAGE_FIELD_NAMES_NO_DESCRIPTOR
+		22:3:MESSAGE_FIELD_NAMES_NO_DESCRIPTOR
+		26:3:MESSAGE_FIELD_NAMES_NO_DESCRIPTOR
+		30:3:MESSAGE_FIELD_NAMES_NO_DESCRIPTOR
+		34:3:MESSAGE_FIELD_NAMES_NO_DESCRIPTOR`,
+		"testdata/lint/nodescriptor/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
 		`16:7:MESSAGE_FIELD_NAMES_FILENAME
 		18:9:MESSAGE_FIELD_NAMES_FILENAME
 		21:5:MESSAGE_FIELD_NAMES_FILENAME
@@ -582,6 +600,19 @@ func TestLint(t *testing.T) {
 		20:3:MESSAGE_FIELDS_NOT_FLOATS
 		21:3:MESSAGE_FIELDS_NOT_FLOATS`,
 		"testdata/lint/floatsnosuppress/foo/v1/foo.proto",
+	)
+
+	assertDoLintFile(
+		t,
+		false,
+		`14:3:MESSAGE_FIELDS_NOT_FLOATS`,
+		"testdata/lint/ignoredir/foo/v1/foo.proto",
+	)
+	assertDoLintFile(
+		t,
+		true,
+		``,
+		"testdata/lint/ignoredir/bar/v1/bar.proto",
 	)
 
 	assertDoLintFile(
@@ -1063,6 +1094,25 @@ option go_package = "foov1";
 option java_multiple_files = true;
 option java_outer_classname = "BazProto";
 option java_package = "com.foo.v1";
+option objc_class_prefix = "FXX";
+option php_namespace = "Foo\\V1";`,
+	)
+	// in dir with prototool.yaml with override with java_package_prefix
+	assertDoCreateFile(
+		t,
+		true,
+		true,
+		"testdata/create/version2five/baz.proto",
+		"",
+		`syntax = "proto3";
+
+package foo.v1;
+
+option csharp_namespace = "Foo.V1";
+option go_package = "foov1";
+option java_multiple_files = true;
+option java_outer_classname = "BazProto";
+option java_package = "au.com.foo.v1";
 option objc_class_prefix = "FXX";
 option php_namespace = "Foo\\V1";`,
 	)

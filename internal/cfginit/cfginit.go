@@ -29,6 +29,8 @@ import (
 )
 
 var tmpl = template.Must(template.New("tmpl").Parse(`# Paths to exclude when searching for Protobuf files.
+# These can either be file or directory names.
+# If there is a directory name, that directory and all sub-directories will be excluded.
 {{.V}}excludes:
 {{.V}}  - path/to/a
 {{.V}}  - path/to/b/file.proto
@@ -74,6 +76,8 @@ protoc:
 {{.V}}  group: uber2
 
   # Linter files to ignore.
+  # These can either be file or directory names.
+  # If there is a directory name, that directory and all sub-directories will be ignored.
 {{.V}}  ignores:
 {{.V}}    - id: RPC_NAMES_CAMEL_CASE
 {{.V}}      files:
@@ -81,7 +85,7 @@ protoc:
 {{.V}}        - path/to/bar.proto
 {{.V}}    - id: SYNTAX_PROTO3
 {{.V}}      files:
-{{.V}}        - path/to/foo.proto
+{{.V}}        - path/to/dir
 
   # Linter rules.
   # Run prototool lint --list-all-linters to see all available linters.
@@ -101,19 +105,32 @@ protoc:
 {{.V}}    remove:
 {{.V}}      - ENUM_NAMES_CAMEL_CASE
 
-  # The path to the file header for all Protobuf files.
-  # If this is set and the FILE_HEADER linter is turned on, files will
-  # be checked to begin with the contents of this file, and format --fix
+  # The path to the file header or the file header content for all Protobuf files.
+  # If either path or content is set and the FILE_HEADER linter is turned on,
+  # files will be checked to begin with the given header, and format --fix
   # will place this header before the syntax declaration. Note that
   # format --fix will delete anything before the syntax declaration
   # if this is set.
+  #
+  # Set path to use a file's contents for the header. Path must be relative.
+  # Set content to directly specify the header.
+  # **Both path and content cannot be set at the same time. They are only done
+  # so here for example purposes.**
   #
   # If is_commented is set, this file is assumed to already have comments
   # and will be added directly. If is_commented is not set, "// " will be
   # added before every line.
 {{.V}}  file_header:
 {{.V}}    path: path/to/protobuf_file_header.txt
+{{.V}}    content: |
+{{.V}}      //
+{{.V}}      // Acme, Inc. (c) 2019
+{{.V}}      //
 {{.V}}    is_commented: true
+  # Override the default java_package file option prefix of "com".
+  # If this is set, this will affect lint, create, and format --fix to use.
+  # this prefix instead of "com".
+{{.V}}  java_package_prefix: au.com
 
 # Code generation directives.
 {{.V}}generate:

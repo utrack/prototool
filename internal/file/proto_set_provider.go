@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/uber/prototool/internal/settings"
@@ -117,6 +118,11 @@ func (c *protoSetProvider) getMultipleForDir(workDirPath string, dirPath string)
 		protoSet.WorkDirPath = workDirPath
 		protoSet.DirPath = absDirPath
 	}
+	for _, protoSet := range protoSets {
+		if err := validateProtoSet(protoSet); err != nil {
+			return nil, err
+		}
+	}
 	c.logger.Debug("returning ProtoSets", zap.String("workDirPath", workDirPath), zap.String("dirPath", dirPath), zap.Any("protoSets", protoSets))
 	return protoSets, nil
 }
@@ -206,21 +212,17 @@ func (c *protoSetProvider) getConfig(absDirPath string) (settings.Config, error)
 // absWorkDirPath is only used to determine the ProtoFile.DisplayPath, also known as
 // the relative path from where prototool was invoked.
 func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDirPath string) ([]*ProtoFile, error) {
-	var (
-		protoFiles     []*ProtoFile
-		numWalkedFiles int
-		timedOut       bool
-	)
-	allExcludes := make(map[string]struct{})
+	var protoFiles []*ProtoFile
+	var numWalkedFiles int
+	var timedOut bool
+	var excludes []string
+	var err error
 	// if we have a configData, we compute the exclude prefixes once
 	// from this dirPath and data, and do not do it again in the below walk function
 	if c.configData != "" {
-		excludes, err := c.configProvider.GetExcludePrefixesForData(absWorkDirPath, c.configData)
+		excludes, err = c.configProvider.GetExcludePrefixesForData(absWorkDirPath, c.configData)
 		if err != nil {
 			return nil, err
-		}
-		for _, exclude := range excludes {
-			allExcludes[exclude] = struct{}{}
 		}
 	}
 	walkErrC := make(chan error)
@@ -242,15 +244,13 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 					// Add the excluded files with respect to the current file path.
 					// Do not add if we have configData.
 					if c.configData == "" {
-						excludes, err := c.configProvider.GetExcludePrefixesForDir(filePath)
+						iExcludes, err := c.configProvider.GetExcludePrefixesForDir(filePath)
 						if err != nil {
 							return err
 						}
-						for _, exclude := range excludes {
-							allExcludes[exclude] = struct{}{}
-						}
+						excludes = append(excludes, iExcludes...)
 					}
-					if isExcluded(filePath, absDirPath, allExcludes) {
+					if IsExcluded(filePath, absDirPath, excludes...) {
 						return filepath.SkipDir
 					}
 					return nil
@@ -258,7 +258,7 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 				if filepath.Ext(filePath) != ".proto" {
 					return nil
 				}
-				if isExcluded(filePath, absDirPath, allExcludes) {
+				if IsExcluded(filePath, absDirPath, excludes...) {
 					return nil
 				}
 
@@ -297,6 +297,34 @@ func (c *protoSetProvider) walkAndGetAllProtoFiles(absWorkDirPath string, absDir
 	}
 }
 
+func validateProtoSet(protoSet *ProtoSet) error {
+	for dirPath, protoFiles := range protoSet.DirPathToFiles {
+		for _, protoFile := range protoFiles {
+			if filepath.Dir(protoFile.Path) != dirPath {
+				return fmt.Errorf("%s does not reside within %s, this is a system error", protoFile.Path, dirPath)
+			}
+			if err := validateIsRel(protoSet.Config.DirPath, protoFile.Path); err != nil {
+				return fmt.Errorf("proto file %s not within config dirPath %s: %v", protoFile.Path, protoSet.Config.DirPath, err)
+			}
+		}
+	}
+	return nil
+}
+
+func validateIsRel(base string, dir string) error {
+	rel, err := filepath.Rel(base, dir)
+	if err != nil {
+		return fmt.Errorf("could not make %s relative to %s, this is a system error: %v", base, dir, err)
+	}
+	if rel == "" {
+		return fmt.Errorf("could not make %s relative to %s, this is a system error", base, dir)
+	}
+	if strings.HasPrefix(rel, "..") {
+		return fmt.Errorf("could not make %s within %s, got %s, this is a system error", base, dir, rel)
+	}
+	return nil
+}
+
 func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {
 	dirPathToProtoFiles := make(map[string][]*ProtoFile)
 	for _, protoFile := range protoFiles {
@@ -304,33 +332,4 @@ func getDirPathToProtoFiles(protoFiles []*ProtoFile) map[string][]*ProtoFile {
 		dirPathToProtoFiles[dir] = append(dirPathToProtoFiles[dir], protoFile)
 	}
 	return dirPathToProtoFiles
-}
-
-// isExcluded determines whether the given filePath should be excluded.
-// Note that all excludes are assumed to be cleaned absolute paths at
-// this point.
-// stopPath represents the absolute path to the prototool configuration.
-// This is used to determine when we should stop checking for excludes.
-func isExcluded(filePath, stopPath string, excludes map[string]struct{}) bool {
-	// Use the root as a fallback so that we don't loop forever.
-	root := filepath.Dir(string(filepath.Separator))
-
-	isNested := func(curr, exclude string) bool {
-		for {
-			if curr == stopPath || curr == root {
-				return false
-			}
-			if curr == exclude {
-				return true
-			}
-			curr = filepath.Dir(curr)
-		}
-	}
-	for exclude := range excludes {
-		if isNested(filePath, exclude) {
-			return true
-		}
-	}
-	return false
-
 }

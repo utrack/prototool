@@ -3,7 +3,7 @@ load("@bazel_gazelle//:deps.bzl", "go_repository")
 def prototool_deps(**kwargs):
     go_repository(
         name = "co_honnef_go_tools",
-        commit = "51b3beccf3bd",
+        commit = "c2f93a96b099",
         importpath = "honnef.co/go/tools",
     )
     go_repository(
@@ -29,12 +29,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_emicklei_proto",
         importpath = "github.com/emicklei/proto",
-        tag = "v1.6.7",
-    )
-    go_repository(
-        name = "com_github_fsnotify_fsnotify",
-        importpath = "github.com/fsnotify/fsnotify",
-        tag = "v1.4.7",
+        tag = "v1.6.8",
     )
     go_repository(
         name = "com_github_fullstorydev_grpcurl",
@@ -42,104 +37,19 @@ def prototool_deps(**kwargs):
         tag = "v1.1.0",
     )
     go_repository(
-        name = "com_github_gobuffalo_buffalo_plugins",
-        importpath = "github.com/gobuffalo/buffalo-plugins",
-        tag = "v1.8.2",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_envy",
-        importpath = "github.com/gobuffalo/envy",
-        tag = "v1.6.11",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_events",
-        importpath = "github.com/gobuffalo/events",
-        tag = "v1.1.8",
-    )
-    go_repository(
         name = "com_github_gobuffalo_flect",
-        commit = "d687a3953028",
         importpath = "github.com/gobuffalo/flect",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_genny",
-        commit = "84844398a37d",
-        importpath = "github.com/gobuffalo/genny",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_licenser",
-        commit = "fe900bbede07",
-        importpath = "github.com/gobuffalo/licenser",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_logger",
-        commit = "5b956e21995c",
-        importpath = "github.com/gobuffalo/logger",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_mapi",
-        importpath = "github.com/gobuffalo/mapi",
-        tag = "v1.0.1",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_meta",
-        commit = "0d7e59dd540b",
-        importpath = "github.com/gobuffalo/meta",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_packd",
-        commit = "c49825f8f6f4",
-        importpath = "github.com/gobuffalo/packd",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_packr_v2",
-        importpath = "github.com/gobuffalo/packr/v2",
-        tag = "v2.0.0-rc.11",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_plush",
-        importpath = "github.com/gobuffalo/plush",
-        tag = "v3.7.32",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_plushgen",
-        commit = "eedb135bd51b",
-        importpath = "github.com/gobuffalo/plushgen",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_release",
-        importpath = "github.com/gobuffalo/release",
-        tag = "v1.1.1",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_shoulders",
-        importpath = "github.com/gobuffalo/shoulders",
-        tag = "v1.0.1",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_syncx",
-        commit = "558ac7de985f",
-        importpath = "github.com/gobuffalo/syncx",
-    )
-    go_repository(
-        name = "com_github_gobuffalo_tags",
-        importpath = "github.com/gobuffalo/tags",
-        tag = "v2.0.14",
+        tag = "v0.1.0",
     )
     go_repository(
         name = "com_github_gofrs_flock",
         importpath = "github.com/gofrs/flock",
-        tag = "v0.7.0",
+        tag = "v0.7.1",
     )
     go_repository(
         name = "com_github_golang_glog",
         commit = "23def4e6c14b",
         importpath = "github.com/golang/glog",
-    )
-    go_repository(
-        name = "com_github_golang_lint",
-        commit = "8f45f776aaf1",
-        importpath = "github.com/golang/lint",
     )
     go_repository(
         name = "com_github_golang_mock",
@@ -149,17 +59,7 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "com_github_golang_protobuf",
         importpath = "github.com/golang/protobuf",
-        tag = "v1.2.0",
-    )
-    go_repository(
-        name = "com_github_hashicorp_hcl",
-        importpath = "github.com/hashicorp/hcl",
-        tag = "v1.0.0",
-    )
-    go_repository(
-        name = "com_github_hpcloud_tail",
-        importpath = "github.com/hpcloud/tail",
-        tag = "v1.0.0",
+        tag = "v1.3.0",
     )
     go_repository(
         name = "com_github_inconshreveable_mousetrap",
@@ -172,113 +72,18 @@ def prototool_deps(**kwargs):
         tag = "v1.1.0",
     )
     go_repository(
-        name = "com_github_joho_godotenv",
-        importpath = "github.com/joho/godotenv",
-        tag = "v1.3.0",
-    )
-    go_repository(
-        name = "com_github_karrick_godirwalk",
-        importpath = "github.com/karrick/godirwalk",
-        tag = "v1.7.7",
-    )
-    go_repository(
-        name = "com_github_kisielk_errcheck",
-        importpath = "github.com/kisielk/errcheck",
-        tag = "v1.2.0",
-    )
-    go_repository(
-        name = "com_github_kisielk_gotool",
-        importpath = "github.com/kisielk/gotool",
-        tag = "v1.0.0",
-    )
-    go_repository(
-        name = "com_github_konsorten_go_windows_terminal_sequences",
-        importpath = "github.com/konsorten/go-windows-terminal-sequences",
-        tag = "v1.0.1",
-    )
-    go_repository(
-        name = "com_github_kr_pretty",
-        importpath = "github.com/kr/pretty",
-        tag = "v0.1.0",
-    )
-    go_repository(
-        name = "com_github_kr_pty",
-        importpath = "github.com/kr/pty",
-        tag = "v1.1.3",
-    )
-    go_repository(
-        name = "com_github_kr_text",
-        importpath = "github.com/kr/text",
-        tag = "v0.1.0",
-    )
-    go_repository(
-        name = "com_github_magiconair_properties",
-        importpath = "github.com/magiconair/properties",
-        tag = "v1.8.0",
-    )
-    go_repository(
-        name = "com_github_markbates_deplist",
-        importpath = "github.com/markbates/deplist",
-        tag = "v1.0.5",
-    )
-    go_repository(
-        name = "com_github_markbates_going",
-        importpath = "github.com/markbates/going",
-        tag = "v1.0.2",
-    )
-    go_repository(
-        name = "com_github_markbates_oncer",
-        commit = "bf2de49a0be2",
-        importpath = "github.com/markbates/oncer",
-    )
-    go_repository(
-        name = "com_github_markbates_safe",
-        importpath = "github.com/markbates/safe",
-        tag = "v1.0.1",
-    )
-    go_repository(
-        name = "com_github_masterminds_semver",
-        importpath = "github.com/Masterminds/semver",
-        tag = "v1.4.2",
-    )
-    go_repository(
         name = "com_github_mitchellh_go_wordwrap",
         importpath = "github.com/mitchellh/go-wordwrap",
         tag = "v1.0.0",
     )
     go_repository(
-        name = "com_github_mitchellh_mapstructure",
-        importpath = "github.com/mitchellh/mapstructure",
-        tag = "v1.1.2",
-    )
-    go_repository(
-        name = "com_github_onsi_ginkgo",
-        importpath = "github.com/onsi/ginkgo",
-        tag = "v1.7.0",
-    )
-    go_repository(
-        name = "com_github_onsi_gomega",
-        importpath = "github.com/onsi/gomega",
-        tag = "v1.4.3",
-    )
-    go_repository(
-        name = "com_github_pelletier_go_toml",
-        importpath = "github.com/pelletier/go-toml",
-        tag = "v1.2.0",
-    )
-    go_repository(
         name = "com_github_pkg_errors",
         importpath = "github.com/pkg/errors",
-        tag = "v0.8.0",
+        tag = "v0.8.1",
     )
     go_repository(
         name = "com_github_pmezard_go_difflib",
         importpath = "github.com/pmezard/go-difflib",
-        tag = "v1.0.0",
-    )
-    go_repository(
-        name = "com_github_rogpeppe_go_internal",
-        importpath = "github.com/rogpeppe/go-internal",
         tag = "v1.0.0",
     )
     go_repository(
@@ -287,34 +92,9 @@ def prototool_deps(**kwargs):
         tag = "v1.5.2",
     )
     go_repository(
-        name = "com_github_serenize_snaker",
-        commit = "a683aaf2d516",
-        importpath = "github.com/serenize/snaker",
-    )
-    go_repository(
-        name = "com_github_sirupsen_logrus",
-        importpath = "github.com/sirupsen/logrus",
-        tag = "v1.2.0",
-    )
-    go_repository(
-        name = "com_github_spf13_afero",
-        importpath = "github.com/spf13/afero",
-        tag = "v1.1.2",
-    )
-    go_repository(
-        name = "com_github_spf13_cast",
-        importpath = "github.com/spf13/cast",
-        tag = "v1.3.0",
-    )
-    go_repository(
         name = "com_github_spf13_cobra",
         importpath = "github.com/spf13/cobra",
         tag = "v0.0.3",
-    )
-    go_repository(
-        name = "com_github_spf13_jwalterweatherman",
-        importpath = "github.com/spf13/jwalterweatherman",
-        tag = "v1.0.0",
     )
     go_repository(
         name = "com_github_spf13_pflag",
@@ -322,19 +102,14 @@ def prototool_deps(**kwargs):
         tag = "v1.0.3",
     )
     go_repository(
-        name = "com_github_spf13_viper",
-        importpath = "github.com/spf13/viper",
-        tag = "v1.2.1",
-    )
-    go_repository(
         name = "com_github_stretchr_objx",
         importpath = "github.com/stretchr/objx",
-        tag = "v0.1.1",
+        tag = "v0.1.0",
     )
     go_repository(
         name = "com_github_stretchr_testify",
         importpath = "github.com/stretchr/testify",
-        tag = "v1.2.2",
+        tag = "v1.3.0",
     )
     go_repository(
         name = "com_google_cloud_go",
@@ -343,23 +118,8 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "in_gopkg_check_v1",
-        commit = "788fd7840127",
+        commit = "20d25e280405",
         importpath = "gopkg.in/check.v1",
-    )
-    go_repository(
-        name = "in_gopkg_errgo_v2",
-        importpath = "gopkg.in/errgo.v2",
-        tag = "v2.1.0",
-    )
-    go_repository(
-        name = "in_gopkg_fsnotify_v1",
-        importpath = "gopkg.in/fsnotify.v1",
-        tag = "v1.4.7",
-    )
-    go_repository(
-        name = "in_gopkg_tomb_v1",
-        commit = "dd632973f1e7",
-        importpath = "gopkg.in/tomb.v1",
     )
     go_repository(
         name = "in_gopkg_yaml_v2",
@@ -369,22 +129,17 @@ def prototool_deps(**kwargs):
     go_repository(
         name = "org_golang_google_appengine",
         importpath = "google.golang.org/appengine",
-        tag = "v1.2.0",
+        tag = "v1.1.0",
     )
     go_repository(
         name = "org_golang_google_genproto",
-        commit = "c66870c02cf8",
+        commit = "11092d34479b",
         importpath = "google.golang.org/genproto",
     )
     go_repository(
         name = "org_golang_google_grpc",
         importpath = "google.golang.org/grpc",
-        tag = "v1.17.0",
-    )
-    go_repository(
-        name = "org_golang_x_crypto",
-        commit = "505ab145d0a9",
-        importpath = "golang.org/x/crypto",
+        tag = "v1.19.0",
     )
     go_repository(
         name = "org_golang_x_lint",
@@ -393,7 +148,7 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_x_net",
-        commit = "927f97764cc3",
+        commit = "161cd47e91fd",
         importpath = "golang.org/x/net",
     )
     go_repository(
@@ -403,12 +158,12 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_x_sync",
-        commit = "42b317875d0f",
+        commit = "1d60e4601c6f",
         importpath = "golang.org/x/sync",
     )
     go_repository(
         name = "org_golang_x_sys",
-        commit = "70b957f3b65e",
+        commit = "49385e6e1522",
         importpath = "golang.org/x/sys",
     )
     go_repository(
@@ -418,7 +173,7 @@ def prototool_deps(**kwargs):
     )
     go_repository(
         name = "org_golang_x_tools",
-        commit = "8a6051197512",
+        commit = "bf090417da8b",
         importpath = "golang.org/x/tools",
     )
     go_repository(
@@ -430,11 +185,6 @@ def prototool_deps(**kwargs):
         name = "org_uber_go_multierr",
         importpath = "go.uber.org/multierr",
         tag = "v1.1.0",
-    )
-    go_repository(
-        name = "org_uber_go_tools",
-        commit = "ce2550dad714",
-        importpath = "go.uber.org/tools",
     )
     go_repository(
         name = "org_uber_go_zap",

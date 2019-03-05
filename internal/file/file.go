@@ -32,6 +32,8 @@ import (
 // DefaultWalkTimeout is the default walk timeout.
 const DefaultWalkTimeout time.Duration = 3 * time.Second
 
+var rootDirPath = filepath.Dir(string(filepath.Separator))
+
 // ProtoSet represents a set of .proto files and an associated config.
 //
 // ProtoSets will be validated if returned from this package.
@@ -41,18 +43,21 @@ type ProtoSet struct {
 	// Must be cleaned.
 	WorkDirPath string
 	// The given directory path.
-	// This will be the same as WorkDirPath if files were given.
 	// Must be absolute.
 	// Must be cleaned.
 	DirPath string
 	// The directory path to slice of .proto files.
 	// All paths must be absolute.
+	// All paths must reside within DirPath.
 	// Must be cleaned.
+	// The directory paths will always reside within the config DirPath,
+	// that is filepath.Rel(Config.DirPath, DirPath) will never return
+	// error and always return a non-empty string. Note the string could be ".".
+	// The ProtoFiles will always be in the directory specified by the key.
 	DirPathToFiles map[string][]*ProtoFile
 	// The associated Config.
 	// Must be valid.
-	// The DirPath on the config may differ from the DirPath
-	// on the ProtoSet.
+	// The DirPath on the config may differ from the DirPath on the ProtoSet.
 	Config settings.Config
 }
 
@@ -146,4 +151,20 @@ func CheckAbs(path string) error {
 		return fmt.Errorf("expected absolute path but was %s", path)
 	}
 	return nil
+}
+
+// IsExcluded determines whether the given filePath should be excluded.
+//
+// absConfigDirPath represents the absolute path to the configuration file.
+// This is used to determine when we should stop checking for excludes.
+func IsExcluded(absFilePath string, absConfigDirPath string, absExcludePaths ...string) bool {
+	for _, absExcludePath := range absExcludePaths {
+		for curFilePath := absFilePath; curFilePath != absConfigDirPath && curFilePath != rootDirPath; curFilePath = filepath.Dir(curFilePath) {
+			if curFilePath == absExcludePath {
+				return true
+			}
+		}
+	}
+	return false
+
 }

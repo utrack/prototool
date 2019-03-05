@@ -203,7 +203,7 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		return Config{}, err
 	}
 	includePaths := make([]string, 0, len(e.Protoc.Includes))
-	for _, includePath := range strs.DedupeSort(e.Protoc.Includes, nil) {
+	for _, includePath := range strs.SortUniq(e.Protoc.Includes) {
 		if !filepath.IsAbs(includePath) {
 			includePath = filepath.Join(dirPath, includePath)
 		}
@@ -225,8 +225,8 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 		}
 	}
 
-	genPlugins := make([]GenPlugin, len(e.Gen.Plugins))
-	for i, plugin := range e.Gen.Plugins {
+	genPlugins := make([]GenPlugin, len(e.Generate.Plugins))
+	for i, plugin := range e.Generate.Plugins {
 		genPluginType, err := ParseGenPluginType(plugin.Type)
 		if err != nil {
 			return Config{}, err
@@ -293,15 +293,24 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 	}
 
 	var fileHeader string
-	if e.Lint.FileHeader.Path != "" {
-		if filepath.IsAbs(e.Lint.FileHeader.Path) {
-			return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeader.Path)
+	if e.Lint.FileHeader.Path != "" || e.Lint.FileHeader.Content != "" {
+		if e.Lint.FileHeader.Path != "" && e.Lint.FileHeader.Content != "" {
+			return Config{}, fmt.Errorf("must only specify either file header path or content")
 		}
-		fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeader.Path))
-		if err != nil {
-			return Config{}, err
+		var fileHeaderContent string
+		if e.Lint.FileHeader.Path != "" {
+			if filepath.IsAbs(e.Lint.FileHeader.Path) {
+				return Config{}, fmt.Errorf("path for file header must be relative: %s", e.Lint.FileHeader.Path)
+			}
+			fileHeaderData, err := ioutil.ReadFile(filepath.Join(dirPath, e.Lint.FileHeader.Path))
+			if err != nil {
+				return Config{}, err
+			}
+			fileHeaderContent = string(fileHeaderData)
+		} else { // if e.Lint.FileHeader.Content != ""
+			fileHeaderContent = e.Lint.FileHeader.Content
 		}
-		fileHeaderLines := getFileHeaderLines(fileHeaderData)
+		fileHeaderLines := getFileHeaderLines(fileHeaderContent)
 		if !e.Lint.FileHeader.IsCommented {
 			for i, fileHeaderLine := range fileHeaderLines {
 				if fileHeaderLine == "" {
@@ -312,6 +321,9 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			}
 		}
 		fileHeader = strings.Join(fileHeaderLines, "\n")
+		if fileHeader == "" {
+			return Config{}, fmt.Errorf("file header path or content specifed but result was empty file header")
+		}
 	}
 
 	if !develMode {
@@ -333,18 +345,19 @@ func externalConfigToConfig(develMode bool, e ExternalConfig, dirPath string) (C
 			DirPathToBasePackage: createDirPathToBasePackage,
 		},
 		Lint: LintConfig{
-			IncludeIDs:          strs.DedupeSort(e.Lint.Rules.Add, strings.ToUpper),
-			ExcludeIDs:          strs.DedupeSort(e.Lint.Rules.Remove, strings.ToUpper),
+			IncludeIDs:          strs.SortUniqModify(e.Lint.Rules.Add, strings.ToUpper),
+			ExcludeIDs:          strs.SortUniqModify(e.Lint.Rules.Remove, strings.ToUpper),
 			Group:               strings.ToLower(e.Lint.Group),
 			NoDefault:           e.Lint.Rules.NoDefault,
 			IgnoreIDToFilePaths: ignoreIDToFilePaths,
 			FileHeader:          fileHeader,
+			JavaPackagePrefix:   e.Lint.JavaPackagePrefix,
 			AllowSuppression:    e.Lint.AllowSuppression,
 		},
 		Gen: GenConfig{
 			GoPluginOptions: GenGoPluginOptions{
-				ImportPath:     e.Gen.GoOptions.ImportPath,
-				ExtraModifiers: e.Gen.GoOptions.ExtraModifiers,
+				ImportPath:     e.Generate.GoOptions.ImportPath,
+				ExtraModifiers: e.Generate.GoOptions.ExtraModifiers,
 			},
 			Plugins: genPlugins,
 		},
@@ -391,7 +404,7 @@ func getExcludePrefixesForDir(dirPath string) ([]string, error) {
 
 func getExcludePrefixes(excludes []string, dirPath string) ([]string, error) {
 	excludePrefixes := make([]string, 0, len(excludes))
-	for _, excludePrefix := range strs.DedupeSort(excludes, nil) {
+	for _, excludePrefix := range strs.SortUniq(excludes) {
 		if !filepath.IsAbs(excludePrefix) {
 			excludePrefix = filepath.Join(dirPath, excludePrefix)
 		}
@@ -416,9 +429,9 @@ func jsonUnmarshalStrict(data []byte, v interface{}) error {
 	return decoder.Decode(v)
 }
 
-func getFileHeaderLines(data []byte) []string {
+func getFileHeaderLines(content string) []string {
 	var lines []string
-	for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
+	for _, line := range strings.Split(strings.TrimSpace(content), "\n") {
 		lines = append(lines, strings.TrimSpace(line))
 	}
 	return lines

@@ -61,6 +61,7 @@ var (
 		fileOptionsEqualJavaMultipleFilesTrueLinter,
 		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
 		fileOptionsEqualJavaPackageComPrefixLinter,
+		fileOptionsEqualJavaPackagePrefixLinter,
 		fileOptionsEqualOBJCClassPrefixAbbrLinter,
 		fileOptionsEqualPHPNamespaceCapitalizedLinter,
 		fileOptionsGoPackageNotLongFormLinter,
@@ -89,6 +90,7 @@ var (
 		messageFieldNamesFilepathLinter,
 		messageFieldNamesLowerSnakeCaseLinter,
 		messageFieldNamesLowercaseLinter,
+		messageFieldNamesNoDescriptorLinter,
 		messageNamesCamelCaseLinter,
 		messageNamesCapitalizedLinter,
 		messagesHaveCommentsLinter,
@@ -204,7 +206,7 @@ var (
 		fileOptionsEqualGoPackageV2SuffixLinter,
 		fileOptionsEqualJavaMultipleFilesTrueLinter,
 		fileOptionsEqualJavaOuterClassnameProtoSuffixLinter,
-		fileOptionsEqualJavaPackageComPrefixLinter,
+		fileOptionsEqualJavaPackagePrefixLinter,
 		fileOptionsEqualOBJCClassPrefixAbbrLinter,
 		fileOptionsEqualPHPNamespaceCapitalizedLinter,
 		fileOptionsGoPackageNotLongFormLinter,
@@ -228,6 +230,7 @@ var (
 		messageFieldNamesFilenameLinter,
 		messageFieldNamesFilepathLinter,
 		messageFieldNamesLowerSnakeCaseLinter,
+		messageFieldNamesNoDescriptorLinter,
 		messageFieldsDurationLinter,
 		messageFieldsNoJSONNameLinter,
 		messageFieldsNotFloatsLinter,
@@ -509,12 +512,7 @@ func shouldIgnore(linter Linter, descriptor *FileDescriptor, ignoreIDToFilePaths
 	if !ok {
 		return false, nil
 	}
-	for _, ignoreFilePath := range ignoreFilePaths {
-		if filePath == ignoreFilePath {
-			return true, nil
-		}
-	}
-	return false, nil
+	return file.IsExcluded(filePath, descriptor.ProtoSet.Config.DirPath, ignoreFilePaths...), nil
 }
 
 func checkLintID(lintID string) error {

@@ -18,16 +18,49 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// +build tools
-
-// Package tools blank imports Golang tools we use as part of
-// the Prototool build.
-package tools
+package buf
 
 import (
-	_ "github.com/golang/lint/golint"      // tool
-	_ "github.com/kisielk/errcheck"        // tool
-	_ "go.uber.org/tools/update-license"   // tool
-	_ "golang.org/x/tools/cmd/cover"       // tool
-	_ "honnef.co/go/tools/cmd/staticcheck" // tool
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
+
+func TestBasic(t *testing.T) {
+	testPrinter(
+		t,
+		"onetwothree\n",
+		func(p *Printer) {
+			p.P(`one`, `two`, `three`)
+		},
+	)
+	testPrinter(
+		t,
+		"one two three\n",
+		func(p *Printer) {
+			p.P(`one `, `two `, `three`)
+		},
+	)
+	testPrinter(
+		t,
+		"one\n  twothree\n   four\n\nfive\n\n",
+		func(p *Printer) {
+			// purposefully adding space
+			p.P(`one `)
+			p.In()
+			p.P(`two`, `three`)
+			// purposefully adding space
+			p.P(` four`)
+			p.Out()
+			p.P()
+			p.P(`five`)
+			p.P()
+		},
+	)
+}
+
+func testPrinter(t *testing.T, expected string, f func(*Printer)) {
+	printer := NewPrinter("  ")
+	f(printer)
+	assert.Equal(t, expected, printer.String())
+}

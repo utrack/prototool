@@ -92,6 +92,9 @@ Artifacts are downloaded to the following directories based on flags and environ
 - If --cache-path is set, then this directory will be used. The user is
   expected to manually manage this directory, and the "delete" subcommand
   will have no effect on it.
+- Otherwise, if $PROTOTOOL_CACHE_PATH is set, then this directory will be used.
+  The user is expected to manually manage this directory, and the "delete"
+  subcommand will have no effect on it.
 - Otherwise, if $XDG_CACHE_HOME is set, then $XDG_CACHE_HOME/prototool
   will be used.
 - Otherwise, if on Linux, $HOME/.cache/prototool will be used, or on Darwin,
@@ -115,7 +118,7 @@ Artifacts are downloaded to the following directories based on flags and environ
 - Otherwise, if on Linux, $HOME/.cache/prototool will be deleted, or on Darwin,
   $HOME/Library/Caches/prototool will be deleted.
 
-  This will not delete any custom caches created using the --cache-path option.`,
+  This will not delete any custom caches created using the --cache-path flag or PROTOTOOL_CACHE_PATH environment variable.`,
 		Args: cobra.NoArgs,
 		Run: func(runner exec.Runner, args []string, flags *flags) error {
 			return runner.CacheDelete()
@@ -271,7 +274,7 @@ If Vim integration is set up, files will be generated when you open a new Protob
 		Short: "Call a gRPC endpoint. Be sure to set the required flags address, method, and either data or stdin.",
 		Long: `This command compiles your proto files with "protoc", converts JSON input to binary and converts the result from binary to JSON. All these steps take on the order of milliseconds. For example, the overhead for a file with four dependencies is about 30ms, so there is little overhead for CLI calls to gRPC.
 
-There is a full example for gRPC in the example directory of Prototool. Run "make init example" to make sure everything is installed and generated.
+There is a full example for gRPC in the example directory of Prototool. Run "make example" to make sure everything is installed and generated.
 
 Start the example server in a separate terminal by doing "go run example/cmd/excited/main.go".
 
@@ -282,7 +285,7 @@ prototool grpc [dirOrFile] \
 
 Either use "--data 'requestData'" as the the JSON data to input, or "--stdin" which will result in the input being read from stdin as JSON.
 
-$ make init example # make sure everything is built just in case
+$ make example # make sure everything is built just in case
 
 $ prototool grpc example \
   --address 0.0.0.0:8080 \
@@ -576,6 +579,11 @@ func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writ
 			runnerOptions,
 			exec.RunnerWithCachePath(flags.cachePath),
 		)
+	} else if envCachePath := os.Getenv("PROTOTOOL_CACHE_PATH"); envCachePath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithCachePath(envCachePath),
+		)
 	}
 	if flags.configData != "" {
 		runnerOptions = append(
@@ -594,11 +602,21 @@ func getRunner(develMode bool, stdin io.Reader, stdout io.Writer, stderr io.Writ
 			runnerOptions,
 			exec.RunnerWithProtocBinPath(flags.protocBinPath),
 		)
+	} else if envProtocBinPath := os.Getenv("PROTOTOOL_PROTOC_BIN_PATH"); envProtocBinPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocBinPath(envProtocBinPath),
+		)
 	}
 	if flags.protocWKTPath != "" {
 		runnerOptions = append(
 			runnerOptions,
 			exec.RunnerWithProtocWKTPath(flags.protocWKTPath),
+		)
+	} else if envProtocWKTPath := os.Getenv("PROTOTOOL_PROTOC_WKT_PATH"); envProtocWKTPath != "" {
+		runnerOptions = append(
+			runnerOptions,
+			exec.RunnerWithProtocWKTPath(envProtocWKTPath),
 		)
 	}
 	if flags.errorFormat != "" {
